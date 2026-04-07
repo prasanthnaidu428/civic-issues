@@ -31,97 +31,117 @@ class AIService {
 
   // Analyze image using Gemini Vision API
   async analyzeImageWithGemini(imageUrl, customPrompt = null) {
-    try {
-      const prompt = customPrompt || `
-        Analyze this civic infrastructure image and provide:
-        1. A detailed description of what you see
-        2. Identify any infrastructure issues (potholes, broken lights, drainage problems, etc.)
-        3. Assess the severity level (low, medium, high)
-        4. Suggest the most appropriate category from: pothole, street_light, drainage, traffic_signal, road_damage, sidewalk, graffiti, garbage, water_leak, park_maintenance, noise_complaint, other
-        5. Provide a confidence score (0-1) for your analysis
-
-        Respond in JSON format with keys: description, issues, severity, suggestedCategory, confidence
-      `;
-
-      // First, we need to fetch the image and convert it to base64
-      const imageResponse = await axios.get(imageUrl, { 
-        responseType: 'arraybuffer',
-        timeout: 30000 
-      });
-      const base64Image = Buffer.from(imageResponse.data).toString('base64');
-      const mimeType = imageResponse.headers['content-type'] || 'image/jpeg';
-
-      const response = await axios.post(
-        `${this.geminiBaseUrl}/models/gemini-2.5-flash:generateContent?key=${this.geminiApiKey}`,
-        {
-          contents: [{
-            parts: [
-              { text: prompt },
-              {
-                inline_data: {
-                  mime_type: mimeType,
-                  data: base64Image
-                }
-              }
-            ]
-          }],
-          generationConfig: {
-            temperature: 0.3,
-            topK: 32,
-            topP: 1,
-            maxOutputTokens: 500,
-          }
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          timeout: 30000
-        }
-      );
-
-      const aiResponse = response.data.candidates[0]?.content?.parts[0]?.text;
-      
-      if (!aiResponse) {
-        throw new Error('No response from Gemini API');
-      }
-      
-      // Try to parse JSON response
+    const maxRetries = 3;
+    const retryDelay = 2000; // 2 seconds
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const parsedResponse = JSON.parse(aiResponse);
+        const prompt = customPrompt || `
+          Analyze this civic infrastructure image and provide:
+          1. A detailed description of what you see
+          2. Identify any infrastructure issues (potholes, broken lights, drainage problems, etc.)
+          3. Assess the severity level (low, medium, high)
+          4. Suggest the most appropriate category from: pothole, street_light, drainage, traffic_signal, road_damage, sidewalk, graffiti, garbage, water_leak, park_maintenance, noise_complaint, other
+          5. Provide a confidence score (0-1) for your analysis
+
+          Respond in JSON format with keys: description, issues, severity, suggestedCategory, confidence
+        `;
+
+        // First, we need to fetch the image and convert it to base64
+        const imageResponse = await axios.get(imageUrl, { 
+          responseType: 'arraybuffer',
+          timeout: 30000 
+        });
+        const base64Image = Buffer.from(imageResponse.data).toString('base64');
+        const mimeType = imageResponse.headers['content-type'] || 'image/jpeg';
+
+        const response = await axios.post(
+          `${this.geminiBaseUrl}/models/gemini-1.5-flash:generateContent?key=${this.geminiApiKey}`,
+          {
+            contents: [{
+              parts: [
+                { text: prompt },
+                {
+                  inline_data: {
+                    mime_type: mimeType,
+                    data: base64Image
+                  }
+                }
+              ]
+            }],
+            generationConfig: {
+              temperature: 0.3,
+              topK: 32,
+              topP: 1,
+              maxOutputTokens: 500,
+            }
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            timeout: 30000
+          }
+        );
+
+        const aiResponse = response.data.candidates[0]?.content?.parts[0]?.text;
+        
+        if (!aiResponse) {
+          throw new Error('No response from Gemini API');
+        }
+        
+        // Try to parse JSON response
+        try {
+          const parsedResponse = JSON.parse(aiResponse);
+          return {
+            description: parsedResponse.description || 'AI analysis completed',
+            issues: parsedResponse.issues || [],
+            severity: parsedResponse.severity || 'medium',
+            suggestedCategory: parsedResponse.suggestedCategory || 'other',
+            confidence: parsedResponse.confidence || 0.5,
+            processedAt: new Date(),
+            provider: 'gemini-1.5-flash'
+          };
+        } catch (parseError) {
+          // If JSON parsing fails, return the raw response
+          return {
+            description: aiResponse,
+            severity: 'medium',
+            suggestedCategory: 'other',
+            confidence: 0.3,
+            processedAt: new Date(),
+            provider: 'gemini-1.5-flash'
+          };
+        }
+      } catch (error) {
+        console.error(`Gemini API error (attempt ${attempt}/${maxRetries}):`, error.response?.data || error.message);
+        
+        // Check if it's a 503 (service unavailable) or 429 (rate limit) error
+        const status = error.response?.status;
+        const isRetryable = status === 503 || status === 429 || status === 500;
+        
+        if (isRetryable && attempt < maxRetries) {
+          console.log(`Retrying in ${retryDelay * attempt}ms...`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay * attempt));
+          continue; // Retry
+        }
+        
+        // Log detailed error for debugging
+        if (error.response?.data) {
+          console.error('Gemini API response data:', JSON.stringify(error.response.data));
+        }
+        
+        // Return fallback analysis after all retries exhausted
         return {
-          description: parsedResponse.description || 'AI analysis completed',
-          issues: parsedResponse.issues || [],
-          severity: parsedResponse.severity || 'medium',
-          suggestedCategory: parsedResponse.suggestedCategory || 'other',
-          confidence: parsedResponse.confidence || 0.5,
-          processedAt: new Date(),
-          provider: 'gemini-1.5-pro'
-        };
-      } catch (parseError) {
-        // If JSON parsing fails, return the raw response
-        return {
-          description: aiResponse,
+          description: 'AI analysis temporarily unavailable. The image has been uploaded successfully. Please provide a detailed description of the issue.',
           severity: 'medium',
           suggestedCategory: 'other',
-          confidence: 0.3,
+          confidence: 0.1,
           processedAt: new Date(),
-          provider: 'gemini-1.5-pro'
+          provider: 'fallback',
+          error: error.response?.data?.error?.message || error.message
         };
       }
-    } catch (error) {
-      console.error('Gemini Vision API error:', error.response?.data || error.message);
-      
-      // Return fallback analysis
-      return {
-        description: 'AI analysis unavailable - manual review required',
-        severity: 'medium',
-        suggestedCategory: 'other',
-        confidence: 0.1,
-        processedAt: new Date(),
-        provider: 'fallback',
-        error: error.message
-      };
     }
   }
 
