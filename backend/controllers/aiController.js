@@ -106,7 +106,7 @@ Respond in JSON format with these exact fields:
 }`;
 
     const response = await axios.post(
-      `${GEMINI_BASE_URL}/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `${GEMINI_BASE_URL}/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         contents: [{
           parts: [
@@ -170,7 +170,7 @@ Respond in JSON format with these exact fields:
         keyFeatures: Array.isArray(analysisData.keyFeatures) ? analysisData.keyFeatures : [],
         source: 'gemini_vision',
         timestamp: new Date().toISOString(),
-        model: 'gemini-2.5-flash',
+        model: 'gemini-1.5-flash',
         // Add user-friendly formatting
         severityText: getSeverityText(Math.min(Math.max(analysisData.severity || 1, 1), 5)),
         confidenceText: getConfidenceText(Math.min(Math.max(analysisData.confidence || 0.5, 0), 1)),
@@ -196,7 +196,7 @@ Respond in JSON format with these exact fields:
         keyFeatures: extractKeyFeaturesFromText(cleanText),
         source: 'gemini_vision_text',
         timestamp: new Date().toISOString(),
-        model: 'gemini-2.5-flash',
+        model: 'gemini-1.5-flash',
         severityText: getSeverityText(extractSeverityFromText(cleanText)),
         confidenceText: getConfidenceText(0.7),
         categoryDescription: CIVIC_CATEGORIES[extractCategoryFromText(cleanText)] || CIVIC_CATEGORIES.other,
@@ -277,7 +277,7 @@ const categorizeIssue = asyncHandler(async (req, res) => {
     `;
 
     const response = await axios.post(
-      `${GEMINI_BASE_URL}/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `${GEMINI_BASE_URL}/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
@@ -371,7 +371,7 @@ const generateResolutionSuggestions = asyncHandler(async (req, res) => {
     `;
 
     const response = await axios.post(
-      `${GEMINI_BASE_URL}/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `${GEMINI_BASE_URL}/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
@@ -442,7 +442,7 @@ const healthCheck = asyncHandler(async (req, res) => {
     try {
       // Quick test call to Gemini
       await axios.post(
-        `${GEMINI_BASE_URL}/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        `${GEMINI_BASE_URL}/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
         {
           contents: [{ parts: [{ text: "Test" }] }],
           generationConfig: { maxOutputTokens: 1 }
@@ -477,7 +477,7 @@ const getStats = asyncHandler(async (req, res) => {
     accuracy: 0.85,
     averageResponseTime: 2500, // milliseconds
     lastUpdate: new Date().toISOString(),
-    modelsAvailable: GEMINI_API_KEY ? ['gemini-2.5-flash'] : [],
+    modelsAvailable: GEMINI_API_KEY ? ['gemini-1.5-flash'] : [],
     supportedFeatures: {
       imageAnalysis: !!GEMINI_API_KEY,
       categorization: true,
