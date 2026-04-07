@@ -56,7 +56,7 @@ class AIService {
         const mimeType = imageResponse.headers['content-type'] || 'image/jpeg';
 
         const response = await axios.post(
-          `${this.geminiBaseUrl}/models/gemini-1.5-flash:generateContent?key=${this.geminiApiKey}`,
+          `${this.geminiBaseUrl}/models/gemini-2.5-flash:generateContent?key=${this.geminiApiKey}`,
           {
             contents: [{
               parts: [
@@ -100,7 +100,7 @@ class AIService {
             suggestedCategory: parsedResponse.suggestedCategory || 'other',
             confidence: parsedResponse.confidence || 0.5,
             processedAt: new Date(),
-            provider: 'gemini-1.5-flash'
+            provider: 'gemini-2.5-flash'
           };
         } catch (parseError) {
           // If JSON parsing fails, return the raw response
@@ -110,7 +110,7 @@ class AIService {
             suggestedCategory: 'other',
             confidence: 0.3,
             processedAt: new Date(),
-            provider: 'gemini-1.5-flash'
+            provider: 'gemini-2.5-flash'
           };
         }
       } catch (error) {
