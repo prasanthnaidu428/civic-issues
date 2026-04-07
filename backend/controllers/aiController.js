@@ -722,7 +722,7 @@ function generateSmartFallback(filename, fileType) {
     return `Waste management image uploaded (${filename}). This appears to be related to garbage or litter issues. Photo taken on ${timestamp}. Please provide details about the waste problem.`;
   }
 
-  return `Civic infrastructure image uploaded (${filename}). High-quality ${fileType} image captured on ${timestamp}. AI analysis is temporarily unavailable due to quota limits. Please provide a detailed description of the issue to help with categorization and processing.`;
+  return `Civic infrastructure image uploaded (${filename}). High-quality ${fileType} image captured on ${timestamp}. AI analysis is currently unavailable - the service is experiencing high demand. Please try again in a few minutes, or provide a detailed description of the issue to help with categorization and processing.`;
 }
 
 /**
