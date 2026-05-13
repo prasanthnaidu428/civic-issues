@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 
 // Create axios instance
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+  baseURL: process.env.REACT_APP_API_URL || 'https://civic-reporter-backend-crik.onrender.com/api',
   timeout: 30000, // 30 seconds
   headers: {
     'Content-Type': 'application/json',

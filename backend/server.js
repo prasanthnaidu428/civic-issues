@@ -32,6 +32,7 @@ app.use(helmet({
 app.use(cors({
   origin: [
     process.env.FRONTEND_URL || 'http://localhost:3000',
+    'https://velvety-sherbet-fee697.netlify.app',
     'http://localhost:64971', // Allow React dev server on dynamic port
     /^http:\/\/localhost:\d+$/ // Allow any localhost port for development
   ],
