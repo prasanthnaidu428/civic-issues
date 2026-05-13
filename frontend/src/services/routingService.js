@@ -145,7 +145,6 @@ export const getRoutingOptions = (issue) => {
   }
 
   const [destLng, destLat] = issue.location.coordinates;
-  const destAddress = issue.address?.formatted || '';
 
   return [
     {

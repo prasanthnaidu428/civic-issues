@@ -15,10 +15,8 @@ import {
   MapIcon,
   InformationCircleIcon,
   PhoneIcon,
-  QuestionMarkCircleIcon,
   SignalIcon,
-  BellIcon,
-  SparklesIcon
+  BellIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';

@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, Navigation } from 'lucide-react';
-import StatusBadge from '../UI/StatusBadge';
 
 // Calculate distance between two coordinates in kilometers
 const calculateDistance = (coord1, coord2) => {
@@ -49,6 +48,7 @@ const MapComponent = ({
   const [mapReady, setMapReady] = useState(false);
 
   // Initialize map
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
@@ -109,6 +109,7 @@ const MapComponent = ({
   }, []);
 
   // Add issue markers
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!mapReady || !markersLayerRef.current) return;
 
@@ -322,6 +323,7 @@ const MapComponent = ({
   };
 
   // Show route when selectedIssue changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (selectedIssue && showRouting && adminLocation && mapReady) {
       const [lng, lat] = selectedIssue.location.coordinates;
@@ -330,6 +332,7 @@ const MapComponent = ({
   }, [selectedIssue, showRouting, adminLocation, mapReady]);
 
   // Handle manual location selection marker
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!mapReady || !markersLayerRef.current) return;
 

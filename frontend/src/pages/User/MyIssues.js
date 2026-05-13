@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Search, 
-  Filter, 
   Eye, 
   MapPin, 
   Calendar,
@@ -62,6 +61,7 @@ const MyIssues = () => {
     }
   }, [user]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     filterAndSortIssues();
   }, [issues, searchTerm, statusFilter, sortBy, sortOrder]);

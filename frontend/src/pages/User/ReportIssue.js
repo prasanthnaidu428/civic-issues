@@ -45,7 +45,6 @@ const PRIORITY_LEVELS = [
 
 const ReportIssue = () => {
   const navigate = useNavigate();
-  const { user } = useAuth(); // kept if referenced in JSX; remove if truly unused
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -92,6 +91,7 @@ const ReportIssue = () => {
   const watchedCategory = watch('category');
 
   // 🔥 Auto-fill Title based on category
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (watchedCategory) {
       const categoryLabel =
@@ -104,6 +104,7 @@ const ReportIssue = () => {
   }, [watchedCategory, setValue, watch]);
 
   // Auto-fill location when GPS location is obtained
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (location) {
       setSelectedLocation({
@@ -117,6 +118,7 @@ const ReportIssue = () => {
   }, [location]);
 
   // Handle location errors
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (locationError) {
       let errorMessage = 'Failed to get your location. ';

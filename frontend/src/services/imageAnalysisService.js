@@ -153,7 +153,6 @@ class ImageAnalysisService {
     // Simulate processing delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const issues = [];
     const { width, height } = img;
 
     // Analyze description for keywords

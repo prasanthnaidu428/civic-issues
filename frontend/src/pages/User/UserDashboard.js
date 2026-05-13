@@ -33,6 +33,7 @@ const UserDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedIssue, setSelectedIssue] = useState(null);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchUserData();
   }, []);

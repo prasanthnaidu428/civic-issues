@@ -196,6 +196,9 @@ class LocationService {
             case error.TIMEOUT:
               message = 'Location request timed out';
               break;
+            default:
+              message = 'An unknown error occurred';
+              break;
           }
           
           reject(new Error(message));
@@ -379,11 +382,10 @@ class LocationService {
 
   // Get cache statistics
   getCacheStats() {
-    const now = Date.now();
     let validEntries = 0;
     let expiredEntries = 0;
 
-    for (const [key, value] of this.cache.entries()) {
+    for (const [, value] of this.cache.entries()) {
       if (this.isCacheValid(value)) {
         validEntries++;
       } else {
